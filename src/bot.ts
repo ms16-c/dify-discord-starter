@@ -156,7 +156,7 @@ class DiscordBot {
     }
   }
 
-  private async handleChatCommand(interaction: CommandInteraction) {
+  private async handleChatCommand(interaction: ChatInputCommandInteraction) {
     await interaction.deferReply({ ephemeral: true });
 
     const message = interaction.options.get("message", true);
