@@ -4,7 +4,7 @@ import { Routes } from "discord-api-types/v9";
 import {
   ChannelType,
   Client,
-  CommandInteraction,
+  ChatInputCommandInteraction,
   IntentsBitField,
   type Message,
 } from "discord.js";
@@ -79,7 +79,7 @@ class DiscordBot {
     });
 
     this.client.on("interactionCreate", async (interaction) => {
-      if (!interaction.isCommand()) return;
+      if (!interaction.isChatInputCommand()) return;
 
       if (interaction.commandName === "chat") {
         await this.handleChatCommand(interaction);
@@ -159,7 +159,7 @@ class DiscordBot {
   private async handleChatCommand(interaction: ChatInputCommandInteraction) {
     await interaction.deferReply({ ephemeral: true });
 
-    const message = interaction.options.get("message", true);
+    const message = interaction.options.getString("message", true);
     const cacheKey = this.getCacheKey(
       interaction.user.id,
       interaction.channel?.id
@@ -172,7 +172,7 @@ class DiscordBot {
             username: interaction.user.globalName || interaction.user.username,
             now: new Date().toUTCString(),
           },
-          query: message.value! as string,
+          query: message,
           response_mode: "streaming",
           conversation_id: (cacheKey && conversationCache.get(cacheKey)) || "",
           user: this.getUserId(interaction.user.id, interaction.guild?.id),
@@ -197,7 +197,7 @@ class DiscordBot {
   }
 
   private sendInteractionAnswer(
-    interaction: CommandInteraction,
+    interaction: ChatInputCommandInteraction,
     messages: string[],
     files?: DifyFile[]
   ) {
